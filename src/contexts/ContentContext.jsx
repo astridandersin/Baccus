@@ -8,8 +8,29 @@ export function ContentProvider({ children }) {
         return saved ? JSON.parse(saved) : {};
     });
 
+    // Fetch permanent data from local dev backend on mount
+    useEffect(() => {
+        fetch('/api/content')
+            .then(res => res.json())
+            .then(data => {
+                if (Object.keys(data).length > 0) {
+                    setContent(data);
+                }
+            })
+            .catch(err => console.error('Failed to load content from file:', err));
+    }, []);
+
+    // Save to localStorage immediately and sync to backend
     useEffect(() => {
         localStorage.setItem('baccus_content', JSON.stringify(content));
+
+        if (Object.keys(content).length > 0) {
+            fetch('/api/content', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(content)
+            }).catch(err => console.error('Failed to save content to file:', err));
+        }
     }, [content]);
 
     const updateContent = (id, value) => {

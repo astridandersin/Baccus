@@ -66,7 +66,7 @@ export default function Footer() {
                                         placeholder="Email"
                                         value={email}
                                         onChange={e => setEmail(e.target.value)}
-                                        className="bg-[#242424] border border-[#333] rounded px-2 py-1.5 text-xs text-white focus:border-[#646cff] focus:outline-none"
+                                        className="bg-[#242424] border border-[#333] rounded px-2 py-1.5 text-xs text-white focus:border-[#a41e32] focus:outline-none"
                                         required
                                     />
                                     <input
@@ -74,7 +74,7 @@ export default function Footer() {
                                         placeholder="Password"
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
-                                        className="bg-[#242424] border border-[#333] rounded px-2 py-1.5 text-xs text-white focus:border-[#646cff] focus:outline-none"
+                                        className="bg-[#242424] border border-[#333] rounded px-2 py-1.5 text-xs text-white focus:border-[#a41e32] focus:outline-none"
                                         required
                                     />
                                     {error && <p className="text-red-500 text-[10px]">{error}</p>}

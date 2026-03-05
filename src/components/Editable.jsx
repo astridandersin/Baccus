@@ -62,7 +62,7 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
 
                         {type === 'image' || type === 'background' ? (
                             <div className="space-y-4">
-                                <div className="border-2 border-dashed border-[#333] rounded-lg p-4 flex flex-col items-center justify-center gap-2 text-center hover:border-[#646cff] transition-colors">
+                                <div className="border-2 border-dashed border-[#333] rounded-lg p-4 flex flex-col items-center justify-center gap-2 text-center hover:border-[#a41e32] transition-colors">
                                     {tempValue ? (
                                         <img src={tempValue} alt="Preview" className="max-h-32 object-contain mb-2" />
                                     ) : (
@@ -88,7 +88,7 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
                                     placeholder="https://example.com/image.jpg"
                                     value={tempValue || ''}
                                     onChange={(e) => setTempValue(e.target.value)}
-                                    className="w-full bg-[#242424] border border-[#333] rounded p-3 text-white focus:outline-none focus:border-[#646cff]"
+                                    className="w-full bg-[#242424] border border-[#333] rounded p-3 text-white focus:outline-none focus:border-[#a41e32]"
                                 />
                                 {type === 'background' && (
                                     <button
@@ -103,7 +103,7 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
                             <textarea
                                 value={tempValue}
                                 onChange={(e) => setTempValue(e.target.value)}
-                                className="w-full bg-[#242424] border border-[#333] rounded p-3 text-white focus:outline-none focus:border-[#646cff] min-h-[150px]"
+                                className="w-full bg-[#242424] border border-[#333] rounded p-3 text-white focus:outline-none focus:border-[#a41e32] min-h-[150px]"
                                 autoFocus
                             />
                         ) : (
@@ -111,7 +111,7 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
                                 type="text"
                                 value={tempValue}
                                 onChange={(e) => setTempValue(e.target.value)}
-                                className="w-full bg-[#242424] border border-[#333] rounded p-3 text-white focus:outline-none focus:border-[#646cff]"
+                                className="w-full bg-[#242424] border border-[#333] rounded p-3 text-white focus:outline-none focus:border-[#a41e32]"
                                 autoFocus
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') handleSave();
@@ -130,7 +130,7 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
                         </button>
                         <button
                             onClick={handleSave}
-                            className="px-4 py-2 rounded bg-[#646cff] text-white hover:bg-[#535bf2] border-none"
+                            className="px-4 py-2 rounded bg-[#a41e32] text-white hover:bg-[#8e192b] border-none"
                         >
                             Save Changes
                         </button>
@@ -150,12 +150,12 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
                 <img src={value} alt={id} className="h-full w-full object-contain" />
                 {isLoggedIn && (
                     <div className={clsx(
-                        "absolute inset-0 border-2 border-[#646cff] border-dashed rounded opacity-0 transition-opacity pointer-events-none",
+                        "absolute inset-0 border-2 border-[#a41e32] border-dashed rounded opacity-0 transition-opacity pointer-events-none",
                         "group-hover:opacity-100"
                     )} />
                 )}
                 {isLoggedIn && (
-                    <span className="absolute -top-3 -right-3 hidden group-hover:flex bg-[#646cff] text-white text-[10px] px-1.5 py-0.5 rounded-full items-center shadow-lg pointer-events-none z-10">
+                    <span className="absolute -top-3 -right-3 hidden group-hover:flex bg-[#a41e32] text-white text-[10px] px-1.5 py-0.5 rounded-full items-center shadow-lg pointer-events-none z-10">
                         Edit Image
                     </span>
                 )}
@@ -174,12 +174,12 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
                 {!value && children}
                 {isLoggedIn && (
                     <div className={clsx(
-                        "absolute inset-0 border-2 border-[#646cff] border-dashed rounded opacity-0 transition-opacity pointer-events-none z-50",
+                        "absolute inset-0 border-2 border-[#a41e32] border-dashed rounded opacity-0 transition-opacity pointer-events-none z-50",
                         "group-hover:opacity-100"
                     )} />
                 )}
                 {isLoggedIn && (
-                    <span className="absolute top-4 right-4 hidden group-hover:flex bg-[#646cff] text-white text-[10px] px-1.5 py-0.5 rounded-full items-center shadow-lg pointer-events-none z-50">
+                    <span className="absolute top-4 right-4 hidden group-hover:flex bg-[#a41e32] text-white text-[10px] px-1.5 py-0.5 rounded-full items-center shadow-lg pointer-events-none z-50">
                         Edit Background
                     </span>
                 )}
@@ -189,13 +189,13 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
 
     return (
         <Tag
-            className={clsx(className, isLoggedIn && "hover:outline hover:outline-2 hover:outline-[#646cff] hover:outline-dashed cursor-context-menu relative group")}
+            className={clsx(className, isLoggedIn && "hover:outline hover:outline-2 hover:outline-[#a41e32] hover:outline-dashed cursor-context-menu relative group")}
             onContextMenu={handleContextMenu}
             {...props}
         >
             {value}
             {isLoggedIn && (
-                <span className="absolute -top-3 -right-3 hidden group-hover:flex bg-[#646cff] text-white text-[10px] px-1.5 py-0.5 rounded-full items-center shadow-lg pointer-events-none">
+                <span className="absolute -top-3 -right-3 hidden group-hover:flex bg-[#a41e32] text-white text-[10px] px-1.5 py-0.5 rounded-full items-center shadow-lg pointer-events-none">
                     Edit
                 </span>
             )}
