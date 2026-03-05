@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Wine, Menu, X } from 'lucide-react';
 import clsx from 'clsx';
+import baccusLogo from '../assets/Baccus_logo_white.svg';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,7 +10,7 @@ export default function Header() {
         <header className="fixed top-0 left-0 right-0 z-40 bg-white/5 backdrop-blur-md border-b border-white/10">
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 <div className="flex items-center gap-3 h-12">
-                    <span className="text-white text-lg font-bold tracking-wide">Baccus</span>
+                    <img src={baccusLogo} alt="Baccus Logo" className="h-10 w-auto mix-blend-screen" />
                 </div>
 
                 {/* Desktop Nav */}
