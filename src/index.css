@@ -1,11 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Libre Baskerville", serif;
+  --font-serif: "Libre Baskerville", serif;
+  --font-mono: "Libre Baskerville", serif;
+}
 
 html {
   scroll-behavior: smooth;
 }
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Libre Baskerville", serif;
   line-height: 1.5;
   font-weight: 400;
 

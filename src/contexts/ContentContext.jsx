@@ -22,7 +22,11 @@ export function ContentProvider({ children }) {
 
     // Save to localStorage immediately and sync to backend
     useEffect(() => {
-        localStorage.setItem('baccus_content', JSON.stringify(content));
+        try {
+            localStorage.setItem('baccus_content', JSON.stringify(content));
+        } catch (e) {
+            console.warn('Could not save to localStorage (possibly quota exceeded due to large images).', e);
+        }
 
         if (Object.keys(content).length > 0) {
             fetch('/api/content', {

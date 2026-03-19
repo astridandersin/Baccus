@@ -5,6 +5,8 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Editable from './components/Editable';
 import EventCalendar from './components/EventCalendar';
+import BlogCarousel from './components/BlogCarousel';
+import AboutToggles from './components/AboutToggles';
 import { Plus, MapPin, Clock, X, Euro, Shirt, Languages, Ticket, FileText } from 'lucide-react';
 import RedWineFluidBackground from './components/RedWineFluidBackground';
 
@@ -21,6 +23,7 @@ function AppContent() {
   const { isLoggedIn } = useAuth();
   const { getContent } = useContent();
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showAboutModal, setShowAboutModal] = useState(false);
 
   // Build sorted event lists from calendar data
   const calendarEvents = getContent('calendar-events', {});
@@ -66,6 +69,34 @@ function AppContent() {
                 className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto font-light"
               />
 
+            </div>
+          </section>
+
+          {/* About Section */}
+          <section id="about" className="py-24 bg-transparent scroll-mt-20 relative z-10">
+            <div className="max-w-4xl mx-auto px-6 text-center">
+              <Editable
+                id="about-title"
+                initialValue="Our Philosophy"
+                as="h2"
+                className="text-3xl font-bold mb-10 text-white"
+              />
+              <div className="bg-[#111]/80 backdrop-blur-md border border-white/5 hover:border-[#a41e32]/30 rounded-2xl p-8 md:p-12 transition-all duration-300 hover:shadow-[0_0_30px_rgba(164,30,50,0.08)]">
+                <Editable
+                  id="about-content"
+                  initialValue="Baccus is dedicated to the discovery and celebration of exceptional wines. We traverse the globe, seeking out independent winemakers who pour their souls into every bottle. Our mission is to connect connoisseurs with these hidden gems, fostering a community built around shared passion, uncompromising quality, and the timeless art of winemaking."
+                  as="p"
+                  multiline={true}
+                  className="text-lg text-gray-300 leading-relaxed font-light text-left md:text-center"
+                />
+
+                <button
+                  onClick={() => setShowAboutModal(true)}
+                  className="mt-8 bg-transparent border border-white/20 hover:border-[#a41e32] text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 cursor-pointer"
+                >
+                  Read more...
+                </button>
+              </div>
             </div>
           </section>
 
@@ -247,8 +278,72 @@ function AppContent() {
               </div>
             )}
           </section>
-        </main>
 
+          {/* Blog Section */}
+          <section id="blog" className="py-24 bg-transparent scroll-mt-20 relative z-10">
+            <div className="max-w-4xl mx-auto px-6">
+              <div className="text-center mb-12">
+                <Editable
+                  id="blog-title"
+                  initialValue="Baccus Blog"
+                  as="h2"
+                  className="text-3xl font-bold text-white mb-4"
+                />
+                <Editable
+                  id="blog-subtitle"
+                  initialValue="Stories, tasting notes, and behind-the-scenes from the winemaking world."
+                  as="p"
+                  className="text-gray-400 text-lg"
+                />
+              </div>
+
+            </div>
+
+            <BlogCarousel />
+          </section>
+
+          {/* Contact Section */}
+          <section id="contact" className="py-24 bg-transparent scroll-mt-20 relative z-10">
+            <div className="max-w-4xl mx-auto px-6">
+              <div className="text-center mb-12">
+                <Editable
+                  id="contact-title"
+                  initialValue="Contact Baccus"
+                  as="h2"
+                  className="text-3xl font-bold text-white mb-4"
+                />
+                <Editable
+                  id="contact-subtitle"
+                  initialValue="Have questions about our events or wish to inquire about a private tasting? We're here to help."
+                  as="p"
+                  className="text-gray-400 text-lg"
+                />
+              </div>
+
+              <div className="max-w-2xl mx-auto bg-[#111]/80 backdrop-blur-md border border-white/5 rounded-2xl p-8 shadow-[0_0_30px_rgba(164,30,50,0.08)]">
+                <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Name</label>
+                      <input type="text" className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#a41e32] transition-colors" placeholder="Your name" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Email</label>
+                      <input type="email" className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#a41e32] transition-colors" placeholder="your@email.com" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Message</label>
+                    <textarea rows="4" className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#a41e32] transition-colors resize-none" placeholder="How can we help you?"></textarea>
+                  </div>
+                  <button type="submit" className="w-full bg-[#a41e32] hover:bg-[#8e192b] text-white font-semibold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(164,30,50,0.25)] border-none cursor-pointer">
+                    Send Message
+                  </button>
+                </form>
+              </div>
+            </div>
+          </section>
+        </main>
         <Footer />
       </div>
 
@@ -275,6 +370,39 @@ function AppContent() {
                 console.log('Event saved:', dateKey, eventData);
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* About Modal */}
+      {showAboutModal && (
+        <div
+          className="fixed inset-0 z-50 flex justify-center items-center bg-black/80 backdrop-blur-md px-4 pt-20 pb-8"
+          onClick={() => setShowAboutModal(false)}
+        >
+          <div
+            className="relative bg-[#111] border border-white/10 rounded-2xl p-6 md:p-10 w-full max-w-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowAboutModal(false)}
+              className="absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-colors bg-[#111] md:bg-transparent border-none cursor-pointer z-10"
+              aria-label="Close about"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <div className="overflow-y-auto custom-scrollbar pr-2 md:pr-6 pt-4 text-left">
+              <Editable
+                id="about-modal-title"
+                initialValue="About Baccus"
+                as="h2"
+                className="text-3xl md:text-5xl font-bold text-white mb-8 leading-tight pr-8 md:pr-0"
+              />
+              <div className="w-full pb-8">
+                <AboutToggles />
+              </div>
+            </div>
           </div>
         </div>
       )}

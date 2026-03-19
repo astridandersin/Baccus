@@ -42,7 +42,28 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setTempValue(reader.result);
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    const MAX_WIDTH = 1200;
+                    if (width > MAX_WIDTH) {
+                        height = Math.floor((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Compress to JPEG with 0.8 quality to vastly reduce base64 footprint
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                    setTempValue(compressedBase64);
+                };
+                img.src = reader.result;
             };
             reader.readAsDataURL(file);
         }
@@ -189,7 +210,11 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
 
     return (
         <Tag
-            className={clsx(className, isLoggedIn && "hover:outline hover:outline-2 hover:outline-[#a41e32] hover:outline-dashed cursor-context-menu relative group")}
+            className={clsx(
+                className,
+                multiline && "whitespace-pre-wrap",
+                isLoggedIn && "hover:outline hover:outline-2 hover:outline-[#a41e32] hover:outline-dashed cursor-context-menu relative group"
+            )}
             onContextMenu={handleContextMenu}
             {...props}
         >

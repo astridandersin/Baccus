@@ -15,9 +15,10 @@ export default function Header() {
 
                 {/* Desktop Nav */}
                 <nav className="hidden md:flex items-center gap-8">
+                    <a href="#about" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">About</a>
                     <a href="#upcoming-events" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Events</a>
-                    <a href="#" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Blog</a>
-                    <a href="#" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Contact</a>
+                    <a href="#blog" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Blog</a>
+                    <a href="#contact" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Contact</a>
                 </nav>
 
                 {/* Mobile Menu Button */}
@@ -33,9 +34,10 @@ export default function Header() {
                     "fixed inset-0 top-20 bg-[#111] z-30 flex flex-col items-center pt-12 gap-8 md:hidden transition-transform duration-300 ease-in-out",
                     isMenuOpen ? "translate-x-0" : "translate-x-full"
                 )}>
+                    <a href="#about" className="text-xl font-medium text-gray-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>About</a>
                     <a href="#upcoming-events" className="text-xl font-medium text-gray-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Events</a>
-                    <a href="#" className="text-xl font-medium text-gray-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Blog</a>
-                    <a href="#" className="text-xl font-medium text-gray-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Contact</a>
+                    <a href="#blog" className="text-xl font-medium text-gray-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Blog</a>
+                    <a href="#contact" className="text-xl font-medium text-gray-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Contact</a>
                 </div>
             </div>
         </header>
