@@ -27,7 +27,7 @@ export default function Footer() {
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center md:items-end gap-12 relative w-full">
                 {/* Left: Copyright */}
                 <div className="text-gray-500 text-sm text-center md:text-left z-10 hidden md:block">
-                    <p>© {new Date().getFullYear()} Baccus Wine Club.</p>
+                    <p>© {new Date().getFullYear()} Viinikerho Baccus Ry</p>
                     <div className="mt-2 text-xs opacity-50">
                         <Editable id="footer-address" initialValue="Helsinki, Finland" />
                     </div>
@@ -57,7 +57,7 @@ export default function Footer() {
 
                 {/* Left: Copyright (Mobile only, rendered after socials for flex-col ordering) */}
                 <div className="text-gray-500 text-sm text-center md:hidden z-10 w-full">
-                    <p>© {new Date().getFullYear()} Baccus Wine Club.</p>
+                    <p>© {new Date().getFullYear()} Viinikerho Baccus Ry</p>
                     <div className="mt-2 text-xs opacity-50">
                         <Editable id="footer-address" initialValue="Helsinki, Finland" />
                     </div>

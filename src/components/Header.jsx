@@ -3,21 +3,26 @@ import { Wine, Menu, X } from 'lucide-react';
 import clsx from 'clsx';
 import baccusLogo from '../assets/Baccus_logo_white.svg';
 
-export default function Header() {
+export default function Header({ onOpenGallery }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
         <header className="fixed top-0 left-0 right-0 z-40 bg-white/5 backdrop-blur-md border-b border-white/10">
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-                <div className="flex items-center gap-3 h-12">
+                <a
+                    href="#top"
+                    onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    className="flex items-center gap-3 h-12 cursor-pointer"
+                >
                     <img src={baccusLogo} alt="Baccus Logo" className="h-10 w-auto mix-blend-screen" />
-                </div>
+                </a>
 
                 {/* Desktop Nav */}
                 <nav className="hidden md:flex items-center gap-8">
                     <a href="#about" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">About</a>
                     <a href="#upcoming-events" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Events</a>
                     <a href="#blog" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Blog</a>
+                    <a href="#" onClick={(e) => { e.preventDefault(); onOpenGallery?.(); }} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Gallery</a>
                     <a href="#contact" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Contact</a>
                 </nav>
 
@@ -37,6 +42,7 @@ export default function Header() {
                     <a href="#about" className="text-xl font-medium text-gray-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>About</a>
                     <a href="#upcoming-events" className="text-xl font-medium text-gray-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Events</a>
                     <a href="#blog" className="text-xl font-medium text-gray-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Blog</a>
+                    <a href="#" onClick={(e) => { e.preventDefault(); setIsMenuOpen(false); onOpenGallery?.(); }} className="text-xl font-medium text-gray-300 hover:text-white transition-colors">Gallery</a>
                     <a href="#contact" className="text-xl font-medium text-gray-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Contact</a>
                 </div>
             </div>

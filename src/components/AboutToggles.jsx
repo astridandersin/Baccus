@@ -11,6 +11,7 @@ export default function AboutToggles() {
     const [openId, setOpenId] = useState(null);
     const [draggedToggleIndex, setDraggedToggleIndex] = useState(null);
     const [draggedBlockIndex, setDraggedBlockIndex] = useState(null);
+    const [activeDragId, setActiveDragId] = useState(null);
 
     const defaultToggles = [
         { id: '1', titleFallback: 'Our Events', contentFallback: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' },
@@ -152,19 +153,23 @@ export default function AboutToggles() {
                 return (
                     <div
                         key={toggle.id}
-                        draggable={isLoggedIn && openId === null} // only drag toggle if it is closed for safety
+                        draggable={isLoggedIn && openId === null && activeDragId === `toggle-${toggle.id}`}
                         onDragStart={(e) => handleToggleDragStart(e, toggleIndex)}
                         onDragOver={(e) => handleToggleDragOver(e, toggleIndex)}
                         onDragEnd={handleToggleDragEnd}
                         className={clsx(
-                            "border rounded-xl overflow-hidden bg-[#1a1a1a]/50 transition-all duration-300 relative group/toggle",
-                            isOpen ? "border-[#a41e32]/50 shadow-[0_0_20px_rgba(0,0,0,0.25)]" : "border-white/10 hover:border-[#a41e32]/30 hover:shadow-[0_0_15px_rgba(0,0,0,0.1)]",
+                            "border rounded-xl bg-[#1a1a1a]/50 transition-all duration-300 relative group/toggle",
+                            isOpen ? "border-[#a41e32]/50 shadow-[0_0_20px_rgba(0,0,0,0.25)] z-40" : "border-white/10 hover:border-[#a41e32]/30 hover:shadow-[0_0_15px_rgba(0,0,0,0.1)] z-10",
                             draggedToggleIndex === toggleIndex ? "opacity-40" : ""
                         )}
                     >
                         {/* Drag Handle for Toggle */}
                         {isLoggedIn && !isOpen && (
-                            <div className="absolute left-0 top-0 bottom-0 w-8 flex justify-center items-center cursor-grab active:cursor-grabbing text-gray-600 opacity-0 group-hover/toggle:opacity-100 transition-opacity z-10 hover:bg-white/5">
+                            <div
+                                className="absolute left-0 top-0 bottom-0 w-8 flex justify-center items-center cursor-grab active:cursor-grabbing text-gray-600 opacity-0 group-hover/toggle:opacity-100 transition-opacity z-10 hover:bg-white/5"
+                                onMouseEnter={() => setActiveDragId(`toggle-${toggle.id}`)}
+                                onMouseLeave={() => setActiveDragId(null)}
+                            >
                                 <GripVertical className="w-5 h-5 pointer-events-none" />
                             </div>
                         )}
@@ -176,7 +181,7 @@ export default function AboutToggles() {
                             )}
                             onClick={() => toggleOpen(toggle.id)}
                         >
-                            <div className="flex-1" onClick={(e) => isLoggedIn && e.stopPropagation()}>
+                            <div className="flex-1">
                                 <Editable
                                     id={`about-toggle-${toggle.id}-title`}
                                     initialValue={toggle.titleFallback}
@@ -213,13 +218,13 @@ export default function AboutToggles() {
                                 isOpen ? "grid-rows-[1fr] opacity-100 border-t border-white/5" : "grid-rows-[0fr] opacity-0 border-t border-transparent"
                             )}
                         >
-                            <div className="overflow-hidden">
+                            <div className={isOpen ? "overflow-visible" : "overflow-hidden"}>
                                 <div className="p-5 bg-[#111]/30 flex flex-col gap-6">
                                     {/* Map inner blocks */}
                                     {toggle.blocks.map((block, blockIndex) => (
                                         <div
                                             key={block.id}
-                                            draggable={isLoggedIn}
+                                            draggable={isLoggedIn && activeDragId === `block-${block.id}`}
                                             onDragStart={(e) => handleBlockDragStart(e, blockIndex)}
                                             onDragOver={(e) => handleBlockDragOver(e, toggle.id, blockIndex)}
                                             onDragEnd={handleBlockDragEnd}
@@ -231,7 +236,11 @@ export default function AboutToggles() {
                                         >
                                             {isLoggedIn && (
                                                 <>
-                                                    <div className="absolute left-1 top-1/2 -translate-y-1/2 p-1 cursor-grab active:cursor-grabbing text-gray-600 opacity-0 group-hover/block:opacity-100 transition-opacity">
+                                                    <div
+                                                        className="absolute left-1 top-1/2 -translate-y-1/2 p-1 cursor-grab active:cursor-grabbing text-gray-600 opacity-0 group-hover/block:opacity-100 transition-opacity"
+                                                        onMouseEnter={() => setActiveDragId(`block-${block.id}`)}
+                                                        onMouseLeave={() => setActiveDragId(null)}
+                                                    >
                                                         <GripVertical className="w-4 h-4 pointer-events-none" />
                                                     </div>
                                                     <button

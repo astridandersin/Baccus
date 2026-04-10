@@ -7,6 +7,7 @@ import Editable from './components/Editable';
 import EventCalendar from './components/EventCalendar';
 import BlogCarousel from './components/BlogCarousel';
 import AboutToggles from './components/AboutToggles';
+import GalleryModal from './components/GalleryModal';
 import { Plus, MapPin, Clock, X, Euro, Shirt, Languages, Ticket, FileText } from 'lucide-react';
 import RedWineFluidBackground from './components/RedWineFluidBackground';
 
@@ -24,6 +25,37 @@ function AppContent() {
   const { getContent } = useContent();
   const [showCalendar, setShowCalendar] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
+  const [formStatus, setFormStatus] = useState('');
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setFormStatus('sending');
+    const formData = new FormData(e.target);
+
+    try {
+      const response = await fetch("https://formsubmit.co/ajax/baccus@ky.fi", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(Object.fromEntries(formData))
+      });
+
+      if (response.ok) {
+        setFormStatus('success');
+        e.target.reset();
+        setTimeout(() => setFormStatus(''), 5000);
+      } else {
+        setFormStatus('error');
+        setTimeout(() => setFormStatus(''), 5000);
+      }
+    } catch (error) {
+      setFormStatus('error');
+      setTimeout(() => setFormStatus(''), 5000);
+    }
+  };
 
   // Build sorted event lists from calendar data
   const calendarEvents = getContent('calendar-events', {});
@@ -47,7 +79,7 @@ function AppContent() {
     <div className="relative min-h-screen bg-[#111] text-white flex flex-col font-sans selection:bg-[#a41e32] selection:text-white">
       <RedWineFluidBackground />
       <div className="relative z-10 flex flex-col flex-grow">
-        <Header />
+        <Header onOpenGallery={() => setShowGalleryModal(true)} />
 
         <main className="flex-grow flex flex-col">
           {/* Hero Section */}
@@ -123,7 +155,7 @@ function AppContent() {
               </div>
 
               {/* Event Cards */}
-              <div className="space-y-6">
+              <div className="space-y-6 max-h-[300px] overflow-y-auto pr-2 pb-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20">
                 {upcomingEvents.length === 0 && (
                   <div className="text-center py-16 text-gray-600">
                     <p className="text-lg">No upcoming events</p>
@@ -228,7 +260,7 @@ function AppContent() {
             {pastEvents.length > 0 && (
               <div className="max-w-4xl mx-auto px-6 mt-20">
                 <h2 className="text-2xl font-bold text-gray-500 mb-10">Past Events</h2>
-                <div className="space-y-5">
+                <div className="space-y-5 max-h-[300px] overflow-y-auto pr-2 pb-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20">
                   {pastEvents.map((event) => {
                     const d = new Date(event.dateKey + 'T00:00:00');
                     const timeStr = formatTime(event.doorTime, event.startTime, event.endTime);
@@ -321,24 +353,33 @@ function AppContent() {
               </div>
 
               <div className="max-w-2xl mx-auto bg-[#111]/80 backdrop-blur-md border border-white/5 rounded-2xl p-8 shadow-[0_0_30px_rgba(164,30,50,0.08)]">
-                <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                <form className="space-y-6" onSubmit={handleContactSubmit}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Name</label>
-                      <input type="text" className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#a41e32] transition-colors" placeholder="Your name" />
+                      <input type="text" name="name" required className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#a41e32] transition-colors" placeholder="Your name" />
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Email</label>
-                      <input type="email" className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#a41e32] transition-colors" placeholder="your@email.com" />
+                      <input type="email" name="email" required className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#a41e32] transition-colors" placeholder="your@email.com" />
                     </div>
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Message</label>
-                    <textarea rows="4" className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#a41e32] transition-colors resize-none" placeholder="How can we help you?"></textarea>
+                    <textarea name="message" rows="4" required className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#a41e32] transition-colors resize-none" placeholder="How can we help you?"></textarea>
                   </div>
-                  <button type="submit" className="w-full bg-[#a41e32] hover:bg-[#8e192b] text-white font-semibold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(164,30,50,0.25)] border-none cursor-pointer">
-                    Send Message
+                  <button
+                    type="submit"
+                    disabled={formStatus === 'sending'}
+                    className="w-full bg-[#a41e32] hover:bg-[#8e192b] disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(164,30,50,0.25)] border-none cursor-pointer"
+                  >
+                    {formStatus === 'sending' ? 'Sending...' : formStatus === 'success' ? 'Message Sent! (See note)' : formStatus === 'error' ? 'Failed to Send' : 'Send Message'}
                   </button>
+                  {formStatus === 'success' && (
+                    <p className="text-xs text-center text-gray-400 mt-2">
+                      Note to Master: check baccus@ky.fi inbox for the first-time activation link from FormSubmit!
+                    </p>
+                  )}
                 </form>
               </div>
             </div>
@@ -405,6 +446,11 @@ function AppContent() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Gallery Modal */}
+      {showGalleryModal && (
+        <GalleryModal onClose={() => setShowGalleryModal(false)} />
       )}
     </div>
   );

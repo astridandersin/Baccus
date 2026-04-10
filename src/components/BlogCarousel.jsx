@@ -42,6 +42,7 @@ export default function BlogCarousel() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedPostId, setSelectedPostId] = useState(null);
     const [draggedBlockIndex, setDraggedBlockIndex] = useState(null);
+    const [activeDragId, setActiveDragId] = useState(null);
 
     const posts = getContent('blog-posts', defaultPosts);
 
@@ -67,10 +68,12 @@ export default function BlogCarousel() {
     const handleAddPost = () => {
         const newPost = {
             id: Date.now().toString(),
-            date: "New Date",
+            date: new Date().toISOString().split('T')[0],
             title: "New Blog Post",
-            excerpt: "A brief excerpt...",
-            blocks: [{ id: `b-${Date.now()}`, type: 'text', content: "Start writing here..." }]
+            blocks: [
+                { id: `b-${Date.now()}-e`, type: 'text', content: "A brief excerpt..." },
+                { id: `b-${Date.now()}-c`, type: 'text', content: "Start writing the full post here..." }
+            ]
         };
         const newPosts = [newPost, ...posts];
         updateContent('blog-posts', newPosts);
@@ -190,6 +193,8 @@ export default function BlogCarousel() {
                                     <Editable
                                         id={`blog-post-${post.id}-date`}
                                         initialValue={post.date}
+                                        type="date"
+                                        formatDate={true}
                                         as="div"
                                         className="text-[#a41e32] text-xs font-semibold uppercase tracking-wider mb-2 md:mb-3"
                                     />
@@ -199,13 +204,19 @@ export default function BlogCarousel() {
                                         as="h3"
                                         className="text-lg md:text-xl font-bold text-white mb-2 md:mb-4 leading-tight group-hover:text-gray-100 transition-colors"
                                     />
-                                    <Editable
-                                        id={`blog-post-${post.id}-excerpt`}
-                                        initialValue={post.excerpt}
-                                        as="p"
-                                        multiline={true}
-                                        className="text-xs md:text-sm text-gray-400 leading-relaxed"
-                                    />
+                                    {(() => {
+                                        const firstTextBlock = post.blocks?.find(b => b.type === 'text');
+                                        if (!firstTextBlock) return <p className="text-xs md:text-sm text-gray-500 italic mt-2">No excerpt available</p>;
+                                        return (
+                                            <Editable
+                                                id={`blog-block-${firstTextBlock.id}-text`}
+                                                initialValue={firstTextBlock.content || "A brief excerpt..."}
+                                                as="p"
+                                                multiline={true}
+                                                className="text-xs md:text-sm text-gray-400 leading-relaxed line-clamp-4 md:line-clamp-5 max-h-[100px] md:max-h-[140px] overflow-hidden"
+                                            />
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         );
@@ -231,20 +242,6 @@ export default function BlogCarousel() {
                         <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                     </button>
 
-                    {/* Dots */}
-                    <div className="flex justify-center items-center gap-2 mt-8 z-30 relative">
-                        {posts.map((post, index) => (
-                            <button
-                                key={post.id}
-                                onClick={() => setCurrentIndex(index)}
-                                className={clsx(
-                                    "h-2 rounded-full transition-all duration-300",
-                                    index === currentIndex ? "bg-[#a41e32] w-6" : "bg-white/20 hover:bg-white/50 w-2"
-                                )}
-                                aria-label={`Go to slide ${index + 1}`}
-                            />
-                        ))}
-                    </div>
                 </>
             )}
 
@@ -272,6 +269,8 @@ export default function BlogCarousel() {
                                 <Editable
                                     id={`blog-post-${selectedPost.id}-date`}
                                     initialValue={selectedPost.date}
+                                    type="date"
+                                    formatDate={true}
                                     as="div"
                                     className="text-[#a41e32] text-sm font-semibold uppercase tracking-wider mb-4"
                                 />
@@ -287,7 +286,7 @@ export default function BlogCarousel() {
                                 {selectedPost.blocks.map((block, index) => (
                                     <div
                                         key={block.id}
-                                        draggable={isLoggedIn}
+                                        draggable={isLoggedIn && activeDragId === `blog-block-${block.id}`}
                                         onDragStart={() => handleDragStart(index)}
                                         onDragOver={(e) => handleDragOver(e, index)}
                                         onDragEnd={handleDragEnd}
@@ -299,7 +298,11 @@ export default function BlogCarousel() {
                                     >
                                         {isLoggedIn && (
                                             <>
-                                                <div className="absolute left-0 top-1/2 -translate-y-1/2 p-2 cursor-grab active:cursor-grabbing text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div
+                                                    className="absolute left-0 top-1/2 -translate-y-1/2 p-2 cursor-grab active:cursor-grabbing text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    onMouseEnter={() => setActiveDragId(`blog-block-${block.id}`)}
+                                                    onMouseLeave={() => setActiveDragId(null)}
+                                                >
                                                     <GripVertical className="w-4 h-4" />
                                                 </div>
                                                 <button

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useContent } from '../contexts/ContentContext';
 import { Pencil } from 'lucide-react';
 import clsx from 'clsx';
 
-export default function Editable({ id, initialValue, as: Tag = 'div', className, multiline = false, type = 'text', children, ...props }) {
+export default function Editable({ id, initialValue, as: Tag = 'div', className, multiline = false, type = 'text', formatDate = false, children, ...props }) {
     const { isLoggedIn } = useAuth();
     const { getContent, updateContent } = useContent();
     const [isEditing, setIsEditing] = useState(false);
@@ -70,8 +71,8 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
     };
 
     if (isEditing) {
-        return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={handleCancel}>
+        return createPortal(
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={handleCancel}>
                 <div className="bg-[#1a1a1a] border border-[#333] rounded-lg p-6 w-full max-w-md shadow-2xl space-y-4" onClick={e => e.stopPropagation()}>
                     <h3 className="text-xl font-semibold text-white flex items-center gap-2">
                         <Pencil className="w-5 h-5" />
@@ -127,6 +128,14 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
                                 className="w-full bg-[#242424] border border-[#333] rounded p-3 text-white focus:outline-none focus:border-[#a41e32] min-h-[150px]"
                                 autoFocus
                             />
+                        ) : type === 'date' ? (
+                            <input
+                                type="date"
+                                value={tempValue}
+                                onChange={(e) => setTempValue(e.target.value)}
+                                className="w-full bg-[#242424] border border-[#333] rounded p-3 text-white focus:outline-none focus:border-[#a41e32] color-scheme-dark"
+                                style={{ colorScheme: 'dark' }}
+                            />
                         ) : (
                             <input
                                 type="text"
@@ -145,19 +154,20 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
                     <div className="flex justify-end gap-3 pt-2">
                         <button
                             onClick={handleCancel}
-                            className="px-4 py-2 rounded bg-transparent border border-[#333] hover:border-gray-500 text-gray-300"
+                            className="px-4 py-2 rounded bg-transparent border border-[#333] hover:border-gray-500 text-gray-300 cursor-pointer"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleSave}
-                            className="px-4 py-2 rounded bg-[#a41e32] text-white hover:bg-[#8e192b] border-none"
+                            className="px-4 py-2 rounded bg-[#a41e32] text-white hover:bg-[#8e192b] border-none cursor-pointer"
                         >
                             Save Changes
                         </button>
                     </div>
                 </div>
-            </div>
+            </div>,
+            document.body
         );
     }
 
@@ -208,6 +218,18 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
         );
     }
 
+    let displayValue = value;
+    if (type === 'date' && formatDate && value) {
+        try {
+            const dateObj = new Date(value);
+            if (!isNaN(dateObj.getTime())) {
+                displayValue = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+        } catch (e) {
+            // ignore
+        }
+    }
+
     return (
         <Tag
             className={clsx(
@@ -218,7 +240,7 @@ export default function Editable({ id, initialValue, as: Tag = 'div', className,
             onContextMenu={handleContextMenu}
             {...props}
         >
-            {value}
+            {displayValue}
             {isLoggedIn && (
                 <span className="absolute -top-3 -right-3 hidden group-hover:flex bg-[#a41e32] text-white text-[10px] px-1.5 py-0.5 rounded-full items-center shadow-lg pointer-events-none">
                     Edit

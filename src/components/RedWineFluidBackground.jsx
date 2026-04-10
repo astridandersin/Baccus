@@ -79,7 +79,7 @@ vec3 getNormal(vec3 p) {
 
 float rayMarch(vec3 rayOrigin, vec3 ray) {
     float t = 0.0;
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 40; i++) {
         vec3 p = rayOrigin + ray * t;
         float d = sdf(p);
         if (d < 0.001) return t;
@@ -180,7 +180,8 @@ export default function RedWineFluidBackground() {
                     position: [0, 0, 2],
                 }}
                 orthographic
-                gl={{ antialias: true, alpha: true }}
+                dpr={[1, 1.5]}
+                gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
             >
                 <WineFluidShader />
             </Canvas>
