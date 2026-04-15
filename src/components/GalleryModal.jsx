@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useContent } from '../contexts/ContentContext';
 import { X, Plus, ChevronLeft, Trash2, Image as ImageIcon, Upload } from 'lucide-react';
 import Editable from './Editable';
+import WineGallery from './WineGallery';
 
 // Compress an image file to JPEG base64
 function compressImage(file) {
@@ -189,31 +190,24 @@ export default function GalleryModal({ onClose }) {
                             </div>
                         )}
 
-                        {/* Photos Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8">
+                        {/* Justified Wine Gallery */}
+                        <div className="pb-8">
                             {activeAlbum.photos.length === 0 && !isLoggedIn && (
-                                <div className="col-span-full text-center text-gray-600 py-12">No photos in this album yet.</div>
+                                <div className="text-center text-gray-600 py-12">No photos in this album yet.</div>
                             )}
                             {activeAlbum.photos.length === 0 && isLoggedIn && !isUploading && (
-                                <div className="col-span-full text-center text-gray-600 py-8 text-sm">Drop or select photos above to get started.</div>
+                                <div className="text-center text-gray-600 py-8 text-sm">Drop or select photos above to get started.</div>
                             )}
-                            {activeAlbum.photos.map(photo => (
-                                <div key={photo.id} className="relative aspect-square group rounded-xl overflow-hidden bg-white/5 border border-white/10">
-                                    <img
-                                        src={photo.url || "https://via.placeholder.com/400x400/222222/555555?text=No+Image"}
-                                        alt=""
-                                        className="absolute inset-0 w-full h-full object-cover"
-                                    />
-                                    {isLoggedIn && (
-                                        <button
-                                            onClick={() => handleDeletePhoto(photo.id)}
-                                            className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-red-900/80 text-white rounded opacity-0 group-hover:opacity-100 transition-all border-none cursor-pointer z-10"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    )}
-                                </div>
-                            ))}
+                            {activeAlbum.photos.length > 0 && (
+                                <WineGallery
+                                    images={activeAlbum.photos.map(p => ({
+                                        url: p.url,
+                                        title: p.title || '',
+                                        year: p.year || '',
+                                    }))}
+                                    onDelete={isLoggedIn ? (idx) => handleDeletePhoto(activeAlbum.photos[idx]?.id) : null}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -280,7 +274,7 @@ export default function GalleryModal({ onClose }) {
                                             />
                                         ) : (
                                             <img
-                                                src={album.coverUrl || "https://via.placeholder.com/600x600/1a1a1a/444444?text=Album"}
+                                                src={getContent(`album-${album.id}-cover`, album.coverUrl) || "https://via.placeholder.com/600x600/1a1a1a/444444?text=Album"}
                                                 alt={album.title}
                                                 className="w-full h-full object-cover"
                                             />
