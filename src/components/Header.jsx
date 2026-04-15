@@ -29,7 +29,7 @@ export default function Header({ onOpenGallery }) {
 
                     {/* Mobile Menu Button */}
                     <button
-                        className="md:hidden text-white p-2 relative z-[60]"
+                        className="md:hidden text-white p-2 relative z-[60] outline-none focus:outline-none"
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
                         {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
