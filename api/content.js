@@ -24,6 +24,7 @@ export default async function handler(req, res) {
       await put(BLOB_PATH, body, {
         access: 'public',
         addRandomSuffix: false,
+        allowOverwrite: true,
         contentType: 'application/json',
       });
       return res.status(200).json({ success: true });
