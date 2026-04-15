@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 
 const ContentContext = createContext();
 
@@ -43,8 +43,8 @@ export function ContentProvider({ children }) {
         const saved = localStorage.getItem('baccus_content');
         return saved ? JSON.parse(saved) : {};
     });
-    const saveTimer = useRef(null);
-    const isSaving = useRef(false);
+    const contentRef = useRef(content);
+    contentRef.current = content;
 
     // Fetch permanent data from backend on mount
     useEffect(() => {
@@ -61,62 +61,49 @@ export function ContentProvider({ children }) {
             });
     }, []);
 
-    // Debounced save to localStorage + backend
-    const saveContent = useCallback(async (contentToSave) => {
-        if (isSaving.current) return;
-        isSaving.current = true;
-
-        try {
-            // Always save to localStorage immediately (with base64 intact — it's local)
-            try {
-                localStorage.setItem('baccus_content', JSON.stringify(contentToSave));
-            } catch (e) {
-                console.warn('Could not save to localStorage (possibly quota exceeded).', e);
-            }
-
-            if (Object.keys(contentToSave).length === 0) return;
-
-            // In production, upload base64 images to blob storage first
-            let cleaned = contentToSave;
-            if (!IS_DEV) {
-                cleaned = await extractAndUploadImages(contentToSave);
-                // Update local state with URL-replaced content so future saves don't re-upload
-                setContent(cleaned);
-                try {
-                    localStorage.setItem('baccus_content', JSON.stringify(cleaned));
-                } catch (e) { /* ignore */ }
-            }
-
-            await fetch('/api/content', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(cleaned),
-            });
-        } catch (err) {
-            console.error('Failed to save content:', err);
-        } finally {
-            isSaving.current = false;
-        }
-    }, []);
-
-    // Debounced save effect — waits 800ms after last change before saving
+    // Save immediately on every content change (no debounce)
     useEffect(() => {
         if (!isReadyForSave) return;
 
-        // Immediate localStorage write for responsiveness
+        // Save to localStorage immediately
         try {
             localStorage.setItem('baccus_content', JSON.stringify(content));
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+            console.warn('Could not save to localStorage (possibly quota exceeded).', e);
+        }
 
-        if (saveTimer.current) clearTimeout(saveTimer.current);
-        saveTimer.current = setTimeout(() => {
-            saveContent(content);
-        }, 800);
+        if (Object.keys(content).length === 0) return;
 
-        return () => {
-            if (saveTimer.current) clearTimeout(saveTimer.current);
+        // Save to backend immediately — content without base64 is small (~10KB)
+        fetch('/api/content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(content),
+        }).catch(err => console.error('Failed to save content to file:', err));
+
+        // In production, upload any new base64 images in the background
+        // Once uploaded, save again with URLs replacing the base64 strings
+        if (!IS_DEV) {
+            extractAndUploadImages(content).then(cleaned => {
+                const cleanedStr = JSON.stringify(cleaned);
+                const originalStr = JSON.stringify(contentRef.current);
+                // Only update if images were actually replaced
+                if (cleanedStr !== originalStr) {
+                    setContent(cleaned);
+                }
+            }).catch(err => console.error('Failed to upload images:', err));
+        }
+    }, [content, isReadyForSave]);
+
+    // Flush pending save on page unload as a safety net
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            const data = JSON.stringify(contentRef.current);
+            navigator.sendBeacon('/api/content', new Blob([data], { type: 'application/json' }));
         };
-    }, [content, isReadyForSave, saveContent]);
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, []);
 
     const updateContent = (id, value) => {
         setContent(prev => ({
