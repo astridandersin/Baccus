@@ -48,7 +48,7 @@ export function ContentProvider({ children }) {
 
     // Fetch permanent data from backend on mount
     useEffect(() => {
-        fetch('/api/content')
+        fetch('/api/content', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => {
                 if (Object.keys(data).length > 0) {

@@ -3,13 +3,20 @@ import { list, put } from '@vercel/blob';
 const BLOB_PATH = 'content/data.json';
 
 export default async function handler(req, res) {
+  // Never cache content responses — edits must be visible immediately in every browser
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  res.setHeader('CDN-Cache-Control', 'no-store');
+  res.setHeader('Vercel-CDN-Cache-Control', 'no-store');
+
   if (req.method === 'GET') {
     try {
       const { blobs } = await list({ prefix: BLOB_PATH, limit: 1 });
       if (blobs.length === 0) {
         return res.status(200).json({});
       }
-      const response = await fetch(blobs[0].url);
+      // Cache-bust the blob URL so we always get the latest version after an overwrite
+      const bustUrl = `${blobs[0].url}?t=${Date.now()}`;
+      const response = await fetch(bustUrl, { cache: 'no-store' });
       const data = await response.json();
       return res.status(200).json(data);
     } catch (err) {
@@ -26,6 +33,7 @@ export default async function handler(req, res) {
         addRandomSuffix: false,
         allowOverwrite: true,
         contentType: 'application/json',
+        cacheControlMaxAge: 0,
       });
       return res.status(200).json({ success: true });
     } catch (err) {
