@@ -28,6 +28,12 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+      // Defensive: refuse to overwrite with empty payloads
+      let parsed;
+      try { parsed = JSON.parse(body); } catch { parsed = null; }
+      if (!parsed || typeof parsed !== 'object' || Object.keys(parsed).length === 0) {
+        return res.status(400).json({ error: 'Refusing to save empty content' });
+      }
       await put(BLOB_PATH, body, {
         access: 'public',
         addRandomSuffix: false,

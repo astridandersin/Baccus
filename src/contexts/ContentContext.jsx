@@ -96,14 +96,18 @@ export function ContentProvider({ children }) {
     }, [content, isReadyForSave]);
 
     // Flush pending save on page unload as a safety net
+    // Only runs after initial load and when content has actual data — never send empty {}
     useEffect(() => {
         const handleBeforeUnload = () => {
-            const data = JSON.stringify(contentRef.current);
+            if (!isReadyForSave) return;
+            const current = contentRef.current;
+            if (!current || Object.keys(current).length === 0) return;
+            const data = JSON.stringify(current);
             navigator.sendBeacon('/api/content', new Blob([data], { type: 'application/json' }));
         };
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-    }, []);
+    }, [isReadyForSave]);
 
     const updateContent = (id, value) => {
         setContent(prev => ({
